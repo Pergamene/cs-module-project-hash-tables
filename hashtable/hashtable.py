@@ -11,7 +11,10 @@ class HashTableEntry:
     return self.key
   
   def get_value(self):
-    return self.key
+    return self.value
+
+  def set_value(self, value):
+    self.value = value
 
   def get_next(self):
     return self.next
@@ -26,10 +29,8 @@ class HashTable:
   """
   A hash table that with `capacity` buckets
   that accepts string keys
-
   Implement this.
   """
-
   def __init__(self, capacity=MIN_CAPACITY):
     # Your code here
     self.table = [None] * capacity
@@ -41,29 +42,23 @@ class HashTable:
     Return the length of the list you're using to hold the hash
     table data. (Not the number of items stored in the hash table,
     but the number of slots in the main list.)
-
     One of the tests relies on this.
-
     Implement this.
     """
     # Your code here
     return self.capacity
 
-
   def get_load_factor(self):
     """
     Return the load factor for this hash table.
-
     Implement this.
     """
     # Your code here
     return self.length / self.capacity
 
-
   def fnv1(self, key):
     """
     FNV-1 Hash, 64-bit
-
     Implement this, and/or DJB2.
     """
     # Your code here
@@ -74,70 +69,80 @@ class HashTable:
       hash_val ^= byte
     return hash_val
 
-  # def djb2(self, key):
-  #   """
-  #   DJB2 hash, 32-bit
-
-  #   Implement this, and/or FNV-1.
-  #   """
-  #   # Your code here
-
-
   def hash_index(self, key):
     """
     Take an arbitrary key and return a valid integer index
     between within the storage capacity of the hash table.
     """
     return self.fnv1(key) % self.capacity
-    # return self.djb2(key) % self.capacity
 
   def put(self, key, value):
     """
     Store the value with the given key.
-
     Hash collisions should be handled with Linked List Chaining.
-
     Implement this.
     """
     # Your code here
     key_hash_index = self.hash_index(key)
-    self.table[key_hash_index] = HashTableEntry(key, value)
-
+    new_entry = HashTableEntry(key, value)
+    entry = self.table[key_hash_index]
+    if entry is None:
+      self.table[key_hash_index] = new_entry
+    else:
+      if entry.get_key() == key:
+        entry.set_value(value)
+        return
+      while entry.get_next() is not None:
+        entry = entry.get_next()
+        if entry.get_key() == key:
+          entry.set_value(value)
+          return
+      entry.set_next(new_entry)
 
   def delete(self, key):
     """
     Remove the value stored with the given key.
-
     Print a warning if the key is not found.
-
     Implement this.
     """
     # Your code here
     key_hash_index = self.hash_index(key)
-    self.table[key_hash_index] = None
-
+    entry = self.table[key_hash_index]
+    if entry is not None:
+      if entry.get_key() == key:
+        self.table[key_hash_index] = entry.get_next()
+      else:
+        while entry.get_next() is not None:
+          if entry.get_next().get_key() == key:
+            entry.set_next(entry.get_next().get_next())
+            return
+          else:
+            entry = entry.get_next()
+    print(f'The table does not contain the key: {key}')
 
   def get(self, key):
     """
     Retrieve the value stored with the given key.
-
     Returns None if the key is not found.
-
     Implement this.
     """
     # Your code here
     key_hash_index = self.hash_index(key)
     entry = self.table[key_hash_index]
     if entry is None:
-      return entry
-    return entry.value
-
+      return None
+    if entry.get_key() == key:
+      return entry.get_value()
+    while entry.get_next() is not None:
+      entry = entry.get_next()
+      if entry.get_key() == key:
+        return entry.get_value()
+    return None
 
   def resize(self, new_capacity):
     """
     Changes the capacity of the hash table and
     rehashes all key/value pairs.
-
     Implement this.
     """
     # Your code here
