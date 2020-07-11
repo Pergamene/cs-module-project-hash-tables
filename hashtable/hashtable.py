@@ -34,8 +34,11 @@ class HashTable:
   def __init__(self, capacity=MIN_CAPACITY):
     # Your code here
     self.table = [None] * capacity
-    self.capacity = capacity
+    self.capacity = capacity  
     self.length = 0
+
+  def __len__(self):
+    return self.length
 
   def get_num_slots(self):
     """
@@ -55,6 +58,19 @@ class HashTable:
     """
     # Your code here
     return self.length / self.capacity
+
+  def check_resize(self):
+    load_factor = self.get_load_factor()
+    if load_factor > 0.7:
+      self.resize(self.capacity * 2)
+    if load_factor < 0.2:
+      if self.capacity == MIN_CAPACITY:
+        return
+      half = int(self.capacity / 2)
+      if half > MIN_CAPACITY:
+        self.resize(half)
+      else:
+        self.resize(MIN_CAPACITY)
 
   def fnv1(self, key):
     """
@@ -76,6 +92,26 @@ class HashTable:
     """
     return self.fnv1(key) % self.capacity
 
+  def _add_to_list(self, node, key, value):
+    entry = node
+    if entry.get_key() == key:
+        entry.set_value(value)
+        return
+    while entry.get_next() is not None:
+      entry = entry.get_next()
+      if entry.get_key() == key:
+        entry.set_value(value)
+        return
+    entry.set_next(HashTableEntry(key, value))
+
+  def _add_to_table(self, table, key, value):
+    key_hash_index = self.hash_index(key)
+    entry = table[key_hash_index]
+    if entry is None:
+      table[key_hash_index] = HashTableEntry(key, value)
+    else:
+      self._add_to_list(entry, key, value)
+
   def put(self, key, value):
     """
     Store the value with the given key.
@@ -83,21 +119,9 @@ class HashTable:
     Implement this.
     """
     # Your code here
-    key_hash_index = self.hash_index(key)
-    new_entry = HashTableEntry(key, value)
-    entry = self.table[key_hash_index]
-    if entry is None:
-      self.table[key_hash_index] = new_entry
-    else:
-      if entry.get_key() == key:
-        entry.set_value(value)
-        return
-      while entry.get_next() is not None:
-        entry = entry.get_next()
-        if entry.get_key() == key:
-          entry.set_value(value)
-          return
-      entry.set_next(new_entry)
+    self._add_to_table(self.table, key, value)
+    self.length += 1
+    self.check_resize()
 
   def delete(self, key):
     """
@@ -115,6 +139,8 @@ class HashTable:
         while entry.get_next() is not None:
           if entry.get_next().get_key() == key:
             entry.set_next(entry.get_next().get_next())
+            self.length -= 1
+            self.check_resize()
             return
           else:
             entry = entry.get_next()
@@ -146,7 +172,16 @@ class HashTable:
     Implement this.
     """
     # Your code here
-
+    new_table = [None] * new_capacity
+    self.capacity = new_capacity
+    for i in range(len(self.table)):
+      entry = self.table[i]
+      if entry is not None:
+        self._add_to_table(new_table, entry.get_key(), entry.get_value())
+        while entry.get_next() is not None:
+          entry = entry.get_next()
+          self._add_to_table(new_table, entry.get_key(), entry.get_value())
+    self.table = new_table
 
 if __name__ == "__main__":
   ht = HashTable(8)
