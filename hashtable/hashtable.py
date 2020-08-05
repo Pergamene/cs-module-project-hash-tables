@@ -103,12 +103,14 @@ class HashTable:
         entry.set_value(value)
         return
     entry.set_next(HashTableEntry(key, value))
+    self.length += 1
 
   def _add_to_table(self, table, key, value):
     key_hash_index = self.hash_index(key)
     entry = table[key_hash_index]
     if entry is None:
       table[key_hash_index] = HashTableEntry(key, value)
+      self.length += 1
     else:
       self._add_to_list(entry, key, value)
 
@@ -120,7 +122,6 @@ class HashTable:
     """
     # Your code here
     self._add_to_table(self.table, key, value)
-    self.length += 1
     self.check_resize()
 
   def delete(self, key):
