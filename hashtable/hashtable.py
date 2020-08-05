@@ -136,6 +136,8 @@ class HashTable:
     if entry is not None:
       if entry.get_key() == key:
         self.table[key_hash_index] = entry.get_next()
+        self.length -= 1
+        return
       else:
         while entry.get_next() is not None:
           if entry.get_next().get_key() == key:
