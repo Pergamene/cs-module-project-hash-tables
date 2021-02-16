@@ -50,24 +50,24 @@ decide to stop.
 
 1. Read the file `input.txt` and split it into words.
 
-   Don't worry about changing punctuation or capitalization. For
-   example, a "word" might be `"Hello,`. Just leave it all in there.
+  Don't worry about changing punctuation or capitalization. For
+  example, a "word" might be `"Hello,`. Just leave it all in there.
 
 2. Analyze the text, building up the dataset of which words can follow
-   particular words.
+  particular words.
 
-   (Hint: leave duplicates in for this part. If a the word `and` is seen
-   following the word `goats` multiple times, include all those `and`s.
-   It'll give more convincing results because it is modelling the
-   _frequency_ of _how often_ a word follows another word.)
+  (Hint: leave duplicates in for this part. If a the word `and` is seen
+  following the word `goats` multiple times, include all those `and`s.
+  It'll give more convincing results because it is modelling the
+  _frequency_ of _how often_ a word follows another word.)
 
 3. Choose a random "start word" to begin.
 
 4. Loop through:
 
-   * Print the word.
-   * If it's a "stop word", stop.
-   * Else randomly choose a word that can follow this one.
+  * Print the word.
+  * If it's a "stop word", stop.
+  * Else randomly choose a word that can follow this one.
 
 Start words are words that begin with a capital, or a `"` followed by a
 capital.
@@ -78,8 +78,7 @@ punctuation followed by a `"`.
 Hints:
 
 * `random.choice()` can choose a random word out of a list.
-* `print(s, end=" ")` will print a space after every word instead of a
-  newline.
+* `print(s, end=" ")` will print a space after every word instead of a newline.
 
 There is no test file for this. Just see if it makes good nonsense.
 
